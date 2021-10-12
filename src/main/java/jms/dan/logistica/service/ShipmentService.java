@@ -91,7 +91,7 @@ public class ShipmentService implements IShipmentService {
     }
 
     public void checkOrder(OrderDTO order) {
-        WebClient webClient = WebClient.create("http://localhost:8081/api-orders/orders");
+        WebClient webClient = WebClient.create("http://dan-gateway:8080/orders/api-orders/orders");
         try {
             ResponseEntity<List<OrderDTO>> response = webClient.get()
                     .accept(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ public class ShipmentService implements IShipmentService {
                     .block();
             if (response != null && response.getBody() != null && response.getStatusCode().equals(HttpStatus.OK)) {
                 List<OrderDTO> orders = response.getBody();
-                if(!orders.contains(order)) {
+                if(orders.stream().noneMatch(or -> Objects.equals(or.getId(), order.getId()))) {
                     throw new ApiException(HttpStatus.NOT_FOUND.toString(), "Order not found", HttpStatus.NOT_FOUND.value());
                 }
             }
